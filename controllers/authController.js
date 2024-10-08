@@ -6,14 +6,14 @@ const {json} = require("express");
 const User = require("../models/user")
 exports.register = async (req, res) => {
     try {
-        let {email, password, passwordCheck, name, surname} = req.body;
-        if (!email || !password || !passwordCheck)
+        let {email, password, confirmPassword, name, surname} = req.body;
+        if (!email || !password || !confirmPassword)
             return res.status(400).json({msg: "Not all fields have been entered."});
         if (password.length < 5)
             return res
                 .status(400)
                 .json({msg: "The password needs to be at least 5 characters long."});
-        if (password !== passwordCheck)
+        if (password !== confirmPassword)
             return res
                 .status(400)
                 .json({msg: "Enter the same password twice for verification."});
