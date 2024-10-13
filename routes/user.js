@@ -1,11 +1,12 @@
-var express = require('express');
-const {register} = require("../controllers/authController");
-var router = express.Router();
+const express = require('express');
+const {register, login} = require("../controllers/authController");
+const router = express.Router();
 
 /* GET users listing. */
 router.post('/register', register)
+router.post('/login', login)
 router.get('/', (req, res) => {
-    res.status(200).json({usr: 'ss'})
+    res.status(200).json({usr: 'sss'})
 })
 
 module.exports = router;

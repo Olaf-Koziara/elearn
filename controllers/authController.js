@@ -5,8 +5,11 @@ const mongoose = require("mongoose");
 const {json} = require("express");
 const User = require("../models/user")
 exports.register = async (req, res) => {
+
     try {
+
         let {email, password, confirmPassword, name, surname} = req.body;
+        console.log(req.body)
         if (!email || !password || !confirmPassword)
             return res.status(400).json({msg: "Not all fields have been entered."});
         if (password.length < 5)
@@ -17,7 +20,7 @@ exports.register = async (req, res) => {
             return res
                 .status(400)
                 .json({msg: "Enter the same password twice for verification."});
-        const existingAdmin = await Admin.findOne({email: email});
+        const existingAdmin = await User.findOne({email: email});
         if (existingAdmin)
             return res
                 .status(400)
@@ -35,10 +38,27 @@ exports.register = async (req, res) => {
             surname,
         });
         await newUser.save();
+        console.log(newUser);
         res.status(200).send({success: true, user: {name: name, email: email}});
     } catch (error) {
-        return res.status(500), json({success: failed, result: null, message: error.message});
+        return res.status(500);
     }
 
 
+}
+exports.login = async (req, res) => {
+    console.log(process.env)
+    try {
+        const {email, password} = req.body;
+        User.findOne({email}).then(user => {
+            if (user.validPassword(password)) {
+                const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: 3600});
+                res.status(200).send({success: true, user: user, token});
+            } else {
+                res.status(500).send({success: false})
+            }
+        })
+    } catch (error) {
+
+    }
 }
