@@ -50,14 +50,23 @@ exports.login = async (req, res) => {
     console.log(process.env)
     try {
         const {email, password} = req.body;
-        User.findOne({email}).then(user => {
-            if (user.validPassword(password)) {
-                const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: 3600});
-                res.status(200).send({success: true, user: user, token});
-            } else {
-                res.status(500).send({success: false})
+        if (email && password) {
+            User.findOne({email}).then(user => {
+                if (user && user.validPassword(password)) {
+                    const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: 3600});
+                    res.status(200).send({success: true, user: user, token});
+                } else {
+                    res.status(400).send({success: false, error: "user doesnt exist"})
+                }
+            })
+        } else {
+            if (!email) {
+                res.status(400).send({success: false, error: "Email required"})
             }
-        })
+            if (!password) {
+                res.status(400).send({success: false, error: "Password required"})
+            }
+        }
     } catch (error) {
 
     }
