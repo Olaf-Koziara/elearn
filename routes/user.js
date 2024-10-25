@@ -5,8 +5,8 @@ const router = express.Router();
 /* GET users listing. */
 router.post('/register', register)
 router.post('/login', login)
-router.get('/', (req, res) => {
-    res.status(200).json({usr: 'sss'})
+router.get('/profile', (req, res) => {
+    
 })
 
 module.exports = router;
