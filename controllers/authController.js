@@ -63,17 +63,21 @@ exports.login = catchErrors(async (req, res) => {
     }
 
 })
-exports.authorization = async (req, res, next) => {
+exports.authorization = catchErrors(async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const jwtToken = authHeader.split(' ')[1];
 
     if (jwtToken) {
+
+
         const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
         const user = await User.findOne({email: decoded.email}).select('-password');
         res.status(200).send(user).end()
+
+
     } else {
         res.status(400).end();
     }
 
 
-}
+})
