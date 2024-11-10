@@ -1,13 +1,12 @@
-require('../models/user')
+require('../models/UserModel')
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const {json} = require("express");
-const User = require("../models/user")
+const User = require("../models/UserModel")
 const {catchErrors} = require("../handlers/errorHandlers");
 exports.register = catchErrors(async (req, res) => {
     let {email, password, confirmPassword, name, surname} = req.body;
-    console.log(req.body)
     if (!email || !password || !confirmPassword)
         return res.status(400).json({msg: "Not all fields have been entered."});
     if (password.length < 5)
