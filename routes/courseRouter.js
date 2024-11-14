@@ -1,7 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const multer = require("multer");
-const {createCourse, getCourses, uploadFilesWithIds, updateCourse} = require("../controllers/courseController");
+const {
+    createCourse,
+    getCourses,
+    uploadFilesWithIds,
+    updateCourse,
+    getCourseById, deleteCourseById
+} = require("../controllers/courseController");
 const path = require("path");
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -15,6 +21,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage});
 router.get('/', getCourses)
+router.get('/:id', getCourseById)
+router.delete('/:id', deleteCourseById)
 router.post('/create', upload.single("thumbnail"), createCourse)
 router.post('/files/upload', upload.any(), uploadFilesWithIds)
 router.put('/', updateCourse)

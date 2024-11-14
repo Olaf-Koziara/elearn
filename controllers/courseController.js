@@ -1,7 +1,9 @@
 const {catchErrors} = require("../handlers/errorHandlers");
 const jwt = require("jsonwebtoken");
-const {Course, CourseSlide, CourseSlideElement} = require("../models/CourseModel");
 
+const CourseSlideElement = require("../models/course/CourseSlideElementModel")
+const CourseSlide = require("../models/course/CourseSlideModel");
+const Course = require("../models/course/CourseModel");
 exports.createCourse = catchErrors(async (req, res) => {
 
     try {
@@ -19,7 +21,21 @@ exports.createCourse = catchErrors(async (req, res) => {
         res.status(500).json({message: error.message});
     }
 })
+exports.getCourseById = catchErrors(async (req, res) => {
+    try {
+        const courseId = req.params.id;
+        const course = await Course.findById(courseId).populate({
+            path: 'slides',
+            model: CourseSlide,
+            populate: {path: 'elements', model: CourseSlideElement}
+        })
+        res.status(200).json(course);
 
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
 exports.getCourses = catchErrors(async (req, res) => {
     try {
         const authHeader = req.headers['authorization'];
@@ -28,7 +44,7 @@ exports.getCourses = catchErrors(async (req, res) => {
         if (jwtToken) {
             const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
 
-            const courses = await Course.find({author: decoded.email}); // Znalezienie kursów dla danego autora
+            const courses = await Course.find({author: decoded.email});
             res.status(200).json(courses);
         }
     } catch (error) {
@@ -106,7 +122,27 @@ exports.updateCourse = catchErrors(async (req, res) => {
         res.status(500).send({message: error.message});
     }
 })
+exports.deleteCourseById = catchErrors(async (req, res) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const jwtToken = authHeader.split(' ')[1];
 
+        if (jwtToken) {
+            const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
+            const courseId = req.params.id;
+            if (courseId) {
+                await Course.findOneAndDelete({_id: courseId, author: decoded.email}).then(() => {
+                    res.status(200).send(courseId)
+                });
+
+
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({message: error.message});
+    }
+})
 exports.uploadFilesWithIds = catchErrors(async (req, res) => {
     try {
 
